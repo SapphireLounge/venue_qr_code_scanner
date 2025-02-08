@@ -56,9 +56,11 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
           }
           .react-calendar__tile--now {
             background-color: rgb(37 99 235) !important;
+            color: white !important;
           }
           .react-calendar__tile--active {
-            background-color: rgb(29 78 216) !important;
+            background-color: white !important;
+            color: rgb(31 41 55) !important;
           }
           .react-calendar__month-view__weekdays {
             color: rgb(156 163 175);
@@ -83,7 +85,11 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
       </style>
       
       <Calendar
-        onChange={setSelectedDate}
+        onChange={(value) => {
+          if (value instanceof Date) {
+            setSelectedDate(value);
+          }
+        }}
         value={selectedDate}
         className="rounded-lg bg-gray-800 text-white p-4 w-full"
       />
