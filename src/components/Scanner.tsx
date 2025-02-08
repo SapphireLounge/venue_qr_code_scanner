@@ -58,8 +58,8 @@ export default function Scanner({ onScanSuccess }: ScannerProps) {
         'reader',
         {
           qrbox: {
-            width: 250,
-            height: 250,
+            width: 400,
+            height: 400,
           },
           fps: 5,
           rememberLastUsedCamera: true,
@@ -100,20 +100,49 @@ export default function Scanner({ onScanSuccess }: ScannerProps) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-4">
-      <div className="w-full max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <div className="w-full max-w-2xl mx-auto bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <div className="p-6">
           <h2 className="text-2xl font-bold text-white mb-4 text-center">QR Code Scanner</h2>
           <div className="flex flex-col items-center justify-center space-y-4">
             {scannedData ? (
               <div className="w-full bg-gray-700 rounded-lg p-4 space-y-3">
                 <h3 className="text-lg font-semibold text-green-400 mb-2">Successfully Scanned!</h3>
-                <div className="space-y-2 text-gray-200">
-                  {Object.entries(scannedData).map(([key, value]) => (
-                    <p key={key}>
-                      <span className="font-semibold">{key.charAt(0).toUpperCase() + key.slice(1)}:</span>{' '}
-                      {value?.toString()}
-                    </p>
-                  ))}
+                <div className="space-y-3 text-gray-200">
+                  <div className="flex items-center gap-2">
+                    <span className="text-blue-400">👤</span>
+                    <div>
+                      <p className="font-semibold">{scannedData.customerName}</p>
+                      <p className="text-sm text-gray-400">{scannedData.email}</p>
+                      <p className="text-sm text-gray-400">{scannedData.phone}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="text-yellow-400">📅</span>
+                    <div>
+                      <p className="font-semibold">{scannedData.date}</p>
+                      <p className="text-sm text-gray-400">{scannedData.time}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-purple-400">🎯</span>
+                    <div>
+                      <p><span className="font-semibold">Table:</span> {scannedData.table}</p>
+                      <p><span className="font-semibold">Guests:</span> {scannedData.guests}</p>
+                      <p><span className="font-semibold">Occasion:</span> {scannedData.occasion}</p>
+                    </div>
+                  </div>
+
+                  {scannedData.specialRequests && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-400">📝</span>
+                      <div>
+                        <p className="font-semibold">Special Requests:</p>
+                        <p className="text-sm text-gray-400">{scannedData.specialRequests}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-3 mt-4">
                   <button

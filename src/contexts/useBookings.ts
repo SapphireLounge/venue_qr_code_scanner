@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { BookingsContext } from './BookingsContext';
+import { BookingsContext } from './bookingsContextCore.tsx';
 import { BookingsContextType } from './bookingsTypes';
 
 export function useBookings(): BookingsContextType {

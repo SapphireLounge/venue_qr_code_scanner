@@ -23,6 +23,28 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
     toast.success(`${type === 'email' ? 'Email' : 'SMS'} sent to ${booking.customerName}`);
   };
 
+  const getTileContent = ({ date }: { date: Date }) => {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    const dayBookings = bookings.filter(booking => booking.date === formattedDate);
+    
+    if (dayBookings.length > 0) {
+      return (
+        <div className="text-xs mt-1">
+          {dayBookings.map((booking, index) => (
+            <div key={index} className="text-blue-400 truncate">
+              {booking.customerName}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const handleDateChange = (value: Date) => {
+    setSelectedDate(value);
+  };
+
   return (
     <div className="w-full max-w-md mx-auto p-4">
       <style>
@@ -87,12 +109,12 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
       <Calendar
         onChange={(value) => {
           if (value instanceof Date) {
-            setSelectedDate(value);
-            setSelectedBooking(null);
+            handleDateChange(value);
           }
         }}
         value={selectedDate}
-        className="rounded-lg bg-gray-800 text-white p-4 w-full"
+        className="mb-4"
+        tileContent={getTileContent}
       />
       
       <div className="mt-8">

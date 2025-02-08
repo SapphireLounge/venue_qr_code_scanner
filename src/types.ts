@@ -11,9 +11,12 @@ export interface Booking {
 
 export interface QRCodeData {
   customerName: string;
+  email: string;
+  phone: string;
   date: string;
   time: string;
-  email?: string;
-  phone?: string;
-  details: string;
+  guests: number;
+  table: string;
+  occasion: string;
+  specialRequests?: string;
 }
