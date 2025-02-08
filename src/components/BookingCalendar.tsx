@@ -1,26 +1,26 @@
 import { useState } from 'react';
 import Calendar from 'react-calendar';
 import { format } from 'date-fns';
-import { Booking } from '../types';
-import { Mail, Phone } from 'lucide-react';
+import { QRCodeData } from '../types';
+import { Mail, Phone, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import 'react-calendar/dist/Calendar.css';
 
 interface BookingCalendarProps {
-  bookings: Booking[];
+  bookings: QRCodeData[];
 }
 
 export default function BookingCalendar({ bookings }: BookingCalendarProps) {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedBooking, setSelectedBooking] = useState<QRCodeData | null>(null);
 
   const dateBookings = bookings.filter(
     (booking) => booking.date === format(selectedDate, 'yyyy-MM-dd')
   );
 
-  const handleNotification = async (booking: Booking, type: 'email' | 'sms') => {
+  const handleNotification = async (booking: QRCodeData, type: 'email' | 'sms') => {
     // In a real app, this would connect to a notification service
     toast.success(`${type === 'email' ? 'Email' : 'SMS'} sent to ${booking.customerName}`);
-    booking.notificationSent = true;
   };
 
   return (
@@ -88,6 +88,7 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
         onChange={(value) => {
           if (value instanceof Date) {
             setSelectedDate(value);
+            setSelectedBooking(null);
           }
         }}
         value={selectedDate}
@@ -105,39 +106,54 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
           ) : (
             dateBookings.map((booking) => (
               <div
-                key={booking.id}
-                className={`p-4 rounded-lg ${
-                  booking.notificationSent ? 'bg-green-900' : 'bg-gray-800'
-                }`}
+                key={booking.customerName}
+                className="p-4 rounded-lg bg-gray-800 cursor-pointer hover:bg-gray-700 transition-colors"
+                onClick={() => setSelectedBooking(booking)}
               >
                 <h3 className="font-semibold text-lg">{booking.customerName}</h3>
                 <p className="text-gray-300">Time: {booking.time}</p>
-                <p className="text-gray-300">{booking.details}</p>
-                
-                <div className="mt-3 flex gap-2">
-                  {booking.email && (
-                    <button
-                      onClick={() => handleNotification(booking, 'email')}
-                      className="flex items-center gap-1 px-3 py-1 bg-blue-600 rounded-md"
-                    >
-                      <Mail size={16} />
-                      Email
-                    </button>
-                  )}
-                  {booking.phone && (
-                    <button
-                      onClick={() => handleNotification(booking, 'sms')}
-                      className="flex items-center gap-1 px-3 py-1 bg-blue-600 rounded-md"
-                    >
-                      <Phone size={16} />
-                      SMS
-                    </button>
-                  )}
-                </div>
               </div>
             ))
           )}
         </div>
+
+        {selectedBooking && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md relative">
+              <button
+                onClick={() => setSelectedBooking(null)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              >
+                <X size={24} />
+              </button>
+              <h2 className="text-2xl font-bold mb-4">Booking Details</h2>
+              <div className="space-y-3">
+                {Object.entries(selectedBooking).map(([key, value]) => (
+                  <p key={key} className="text-gray-200">
+                    <span className="font-semibold">{key.charAt(0).toUpperCase() + key.slice(1)}:</span>{' '}
+                    {value?.toString()}
+                  </p>
+                ))}
+              </div>
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => handleNotification(selectedBooking, 'email')}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700"
+                >
+                  <Mail size={20} />
+                  Send Email
+                </button>
+                <button
+                  onClick={() => handleNotification(selectedBooking, 'sms')}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700"
+                >
+                  <Phone size={20} />
+                  Send SMS
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
