@@ -1,6 +1,6 @@
 import { createContext, useState } from 'react';
 import { QRCodeData } from '../types';
-import { toast } from '../toast'; // Assuming toast is imported from another file
+import { toast } from 'react-hot-toast';
 
 export interface BookingsContextType {
   bookings: QRCodeData[];
