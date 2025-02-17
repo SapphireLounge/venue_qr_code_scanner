@@ -2,26 +2,17 @@ import { useState } from 'react';
 import Calendar from 'react-calendar';
 import { format } from 'date-fns';
 import { QRCodeData } from '../types';
-import { Mail, Phone, X } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { X } from 'lucide-react';
+import { useBookings } from '../contexts/useBookings';
 import 'react-calendar/dist/Calendar.css';
 
-interface BookingCalendarProps {
-  bookings: QRCodeData[];
-}
-
-export default function BookingCalendar({ bookings }: BookingCalendarProps) {
+export default function BookingCalendar() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedBooking, setSelectedBooking] = useState<QRCodeData | null>(null);
+  const { bookings, deleteBooking } = useBookings();
 
   const dateBookings = bookings.filter(
     (booking) => booking.date === format(selectedDate, 'yyyy-MM-dd')
   );
-
-  const handleNotification = async (booking: QRCodeData, type: 'email' | 'sms') => {
-    // In a real app, this would connect to a notification service
-    toast.success(`${type === 'email' ? 'Email' : 'SMS'} sent to ${booking.customerName}`);
-  };
 
   const getTileContent = ({ date }: { date: Date }) => {
     const formattedDate = format(date, 'yyyy-MM-dd');
@@ -29,17 +20,34 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
     
     if (dayBookings.length > 0) {
       return (
-        <div className="text-xs mt-1">
-          {dayBookings.map((booking, index) => (
-            <div key={index} className="text-blue-400 truncate">
-              {booking.customerName}
-            </div>
-          ))}
+        <div className="relative w-full h-full">
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 mb-1">
+            <div className="w-2 h-2 bg-blue-500 rounded-full ring-2 ring-white"></div>
+          </div>
         </div>
       );
     }
     return null;
   };
+
+  const renderBookingDetails = (booking: QRCodeData) => (
+    <div key={`${booking.customerName}-${booking.time}`} className="bg-gray-800 rounded-lg p-4 mb-2">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-lg font-semibold text-white">{booking.customerName}</h3>
+          <p className="text-gray-400">Time: {booking.time}</p>
+          <p className="text-gray-400">Guests: {booking.guests}</p>
+          {booking.table && <p className="text-gray-400">Table: {booking.table}</p>}
+        </div>
+        <button
+          onClick={() => deleteBooking(booking)}
+          className="text-red-500 hover:text-red-600 p-1 rounded-full hover:bg-red-500/10 transition-colors"
+        >
+          <X size={20} />
+        </button>
+      </div>
+    </div>
+  );
 
   const handleDateChange = (value: Date) => {
     setSelectedDate(value);
@@ -123,66 +131,14 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
         calendarType="gregory"
       />
       
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">
-          Selected Date: {format(selectedDate, 'MMMM d, yyyy')}
-        </h2>
-        
-        <div className="space-y-4">
-          {dateBookings.length === 0 ? (
-            <p className="text-gray-400">No bookings for this date</p>
-          ) : (
-            dateBookings.map((booking) => (
-              <div
-                key={booking.customerName}
-                className="p-4 rounded-lg bg-gray-800 cursor-pointer hover:bg-gray-700 transition-colors"
-                onClick={() => setSelectedBooking(booking)}
-              >
-                <h3 className="font-semibold text-lg">{booking.customerName}</h3>
-                <p className="text-gray-300">Time: {booking.time}</p>
-              </div>
-            ))
-          )}
+      {dateBookings.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-white mb-4">
+            Bookings for {format(selectedDate, 'MMMM d, yyyy')}
+          </h2>
+          {dateBookings.map(renderBookingDetails)}
         </div>
-
-        {selectedBooking && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-            <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md relative">
-              <button
-                onClick={() => setSelectedBooking(null)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white"
-              >
-                <X size={24} />
-              </button>
-              <h2 className="text-2xl font-bold mb-4">Booking Details</h2>
-              <div className="space-y-3">
-                {Object.entries(selectedBooking).map(([key, value]) => (
-                  <p key={key} className="text-gray-200">
-                    <span className="font-semibold">{key.charAt(0).toUpperCase() + key.slice(1)}:</span>{' '}
-                    {value?.toString()}
-                  </p>
-                ))}
-              </div>
-              <div className="mt-6 flex gap-3">
-                <button
-                  onClick={() => handleNotification(selectedBooking, 'email')}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700"
-                >
-                  <Mail size={20} />
-                  Send Email
-                </button>
-                <button
-                  onClick={() => handleNotification(selectedBooking, 'sms')}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-md hover:bg-blue-700"
-                >
-                  <Phone size={20} />
-                  Send SMS
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

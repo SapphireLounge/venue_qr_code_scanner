@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 export interface BookingsContextType {
   bookings: QRCodeData[];
   addBooking: (booking: QRCodeData) => void;
+  deleteBooking: (booking: QRCodeData) => void;
   getBookingsByDate: (date: string) => QRCodeData[];
   getBookingDetails: (customerName: string) => QRCodeData | undefined;
 }
@@ -30,6 +31,18 @@ export function BookingsProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const deleteBooking = (bookingToDelete: QRCodeData) => {
+    setBookings(prevBookings => 
+      prevBookings.filter(
+        booking => 
+          !(booking.customerName === bookingToDelete.customerName && 
+            booking.date === bookingToDelete.date && 
+            booking.time === bookingToDelete.time)
+      )
+    );
+    toast.success('Booking deleted successfully');
+  };
+
   const getBookingsByDate = (date: string) => {
     return bookings.filter(booking => booking.date === date);
   };
@@ -39,7 +52,13 @@ export function BookingsProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <BookingsContext.Provider value={{ bookings, addBooking, getBookingsByDate, getBookingDetails }}>
+    <BookingsContext.Provider value={{ 
+      bookings, 
+      addBooking, 
+      deleteBooking,
+      getBookingsByDate, 
+      getBookingDetails 
+    }}>
       {children}
     </BookingsContext.Provider>
   );
