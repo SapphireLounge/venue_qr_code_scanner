@@ -236,7 +236,6 @@ export default function Scanner({ onScanSuccess }: ScannerProps) {
                       addBooking(scannedData);
                       onScanSuccess(scannedData);
                       handleClose();
-                      toast.success('Booking added to calendar successfully!');
                     }}
                     className="flex-1 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
                   >
