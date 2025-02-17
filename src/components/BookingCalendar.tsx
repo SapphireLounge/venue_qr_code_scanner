@@ -115,6 +115,12 @@ export default function BookingCalendar({ bookings }: BookingCalendarProps) {
         value={selectedDate}
         className="mb-4"
         tileContent={getTileContent}
+        locale="en-GB"
+        formatDay={(_, date) => format(date, 'd')}
+        formatShortWeekday={(_, date) => 
+          ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'][date.getDay()]
+        }
+        calendarType="gregory"
       />
       
       <div className="mt-8">
